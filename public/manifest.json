@@ -1,0 +1,32 @@
+{
+  "name": "Laundri-Sync | Lavandería Boutique",
+  "short_name": "LaundriSync",
+  "description": "Servicio de lavandería boutique para huéspedes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F6F0",
+  "theme_color": "#1B2A4A",
+  "orientation": "portrait",
+  "categories": ["lifestyle", "utilities"],
+  "lang": "es-AR",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
