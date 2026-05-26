@@ -15,51 +15,40 @@ export function QrScanner({ onCode }: Props) {
   onCodeRef.current = onCode;
 
   useEffect(() => {
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.stop().catch(() => {});
-      }
-    };
-  }, []);
+    if (!open || !containerRef.current) return;
 
-  const startCamera = async () => {
-    if (!containerRef.current) return;
-    setOpen(true);
-
-    const scanner = new Html5Qrcode("qr-reader");
+    const scanner = new Html5Qrcode(containerRef.current.id);
     scannerRef.current = scanner;
 
-    try {
-      await scanner.start(
+    scanner
+      .start(
         { facingMode: "environment" },
         { fps: 15, qrbox: { width: 280, height: 280 } },
         (decodedText) => {
           scanner.stop().catch(() => {});
+          scannerRef.current = null;
           setOpen(false);
           const match = decodedText.trim().match(/\/q\/([A-Za-z0-9_-]+)/i);
           onCodeRef.current(match ? match[1] : decodedText.trim());
         },
         () => {}
-      );
-    } catch {
-      setOpen(false);
-      alert("No se pudo acceder a la cámara.\nAsegurate de permitir el acceso.");
-    }
-  };
+      )
+      .catch(() => {
+        setOpen(false);
+        alert("No se pudo acceder a la cámara.\nAsegurate de permitir el acceso.");
+      });
 
-  const stopCamera = () => {
-    if (scannerRef.current) {
-      scannerRef.current.stop().catch(() => {});
+    return () => {
+      scanner.stop().catch(() => {});
       scannerRef.current = null;
-    }
-    setOpen(false);
-  };
+    };
+  }, [open]);
 
   return (
     <>
       <button
         type="button"
-        onClick={startCamera}
+        onClick={() => setOpen(true)}
         className="px-3 py-3 bg-navy text-white rounded-xl text-sm font-medium hover:bg-navy-light transition-colors flex items-center gap-1.5"
         title="Escanear QR"
       >
@@ -75,10 +64,16 @@ export function QrScanner({ onCode }: Props) {
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="relative w-full max-w-sm bg-black rounded-2xl overflow-hidden">
-            <div ref={containerRef} id="qr-reader" className="w-full" />
+            <div ref={containerRef} id="qr-scanner" className="w-full min-h-[300px]" />
             <button
               type="button"
-              onClick={stopCamera}
+              onClick={() => {
+                if (scannerRef.current) {
+                  scannerRef.current.stop().catch(() => {});
+                  scannerRef.current = null;
+                }
+                setOpen(false);
+              }}
               className="absolute top-3 right-3 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center text-lg hover:bg-black/70 transition-colors z-10"
             >
               ✕
