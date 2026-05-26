@@ -79,7 +79,7 @@ export default function Home() {
           >
             {/* LOGO */}
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="lavaderIA"
               className="mb-8 h-14 md:h-20 w-auto object-contain"
             />
