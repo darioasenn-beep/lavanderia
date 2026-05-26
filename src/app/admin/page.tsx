@@ -26,6 +26,12 @@ const STATUS_BADGE: Record<string, string> = {
   Delivered: "bg-slate-200 text-slate-500",
 };
 
+const PREV_STATUS: Record<string, string> = {
+  Processing: "Pending",
+  Ready: "Processing",
+  Delivered: "Ready",
+};
+
 const STATUS_ACTIONS: Record<string, { label: string; next: string; color: string }[]> = {
   Pending: [{ label: "Iniciar lavado", next: "Processing", color: "bg-gold text-white hover:bg-gold/90" }],
   Processing: [{ label: "Marcar listo", next: "Ready", color: "bg-green-600 text-white hover:bg-green-700" }],
@@ -186,6 +192,18 @@ export default function AdminDashboard() {
                     {action.label}
                   </button>
                 ))}
+                {PREV_STATUS[order.status] && (
+                  <button
+                    onClick={() => {
+                      if (confirm("¿Volver al estado anterior?"))
+                        updateStatus(order.order_id, PREV_STATUS[order.status]);
+                    }}
+                    className="px-2 py-1 rounded-lg text-[10px] font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    title="Volver"
+                  >
+                    ↩
+                  </button>
+                )}
               </div>
             </div>
           </div>
