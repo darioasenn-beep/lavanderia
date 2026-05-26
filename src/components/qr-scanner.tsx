@@ -9,15 +9,16 @@ type Props = {
 
 export function QrScanner({ onCode }: Props) {
   const [open, setOpen] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number>(0);
   const onCodeRef = useRef(onCode);
   onCodeRef.current = onCode;
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      cancelAnimationFrame(rafRef.current);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop());
       }
@@ -28,43 +29,56 @@ export function QrScanner({ onCode }: Props) {
     setOpen(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 640 } },
+        audio: false,
+        video: { facingMode: "environment" },
       });
       streamRef.current = stream;
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = stream;
-      await video.play();
 
-      timerRef.current = setInterval(() => {
-        if (video.readyState < video.HAVE_CURRENT_DATA) return;
-
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 640;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(video, 0, 0);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-        if (code) {
-          stopCamera();
-          const data = code.data.trim();
-          const match = data.match(/\/q\/([A-Za-z0-9_-]+)/i);
-          onCodeRef.current(match ? match[1] : data);
-        }
-      }, 500);
+      video.onloadedmetadata = () => video.play();
     } catch {
       setOpen(false);
       alert("No se pudo acceder a la cámara.\nAsegurate de permitir el acceso.");
     }
   };
 
+  const handlePlaying = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const scan = () => {
+      if (video.readyState < video.HAVE_CURRENT_DATA) {
+        rafRef.current = requestAnimationFrame(scan);
+        return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(video, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (code) {
+        stopCamera();
+        const data = code.data.trim();
+        const match = data.match(/\/q\/([A-Za-z0-9_-]+)/i);
+        onCodeRef.current(match ? match[1] : data);
+        return;
+      }
+
+      rafRef.current = requestAnimationFrame(scan);
+    };
+
+    scan();
+  };
+
   const stopCamera = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+    cancelAnimationFrame(rafRef.current);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
@@ -91,9 +105,19 @@ export function QrScanner({ onCode }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="relative max-w-sm w-full bg-black rounded-2xl overflow-hidden">
-            <video ref={videoRef} className="w-full aspect-square object-cover" playsInline muted />
-            <div className="absolute inset-0 border-[3px] border-gold/60 rounded-2xl pointer-events-none" />
+          <div className="relative w-full max-w-sm bg-black rounded-2xl overflow-hidden">
+            <div className="relative w-full" style={{ aspectRatio: "1/1" }}>
+              <video
+                ref={videoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                onPlaying={handlePlaying}
+                playsInline
+                muted
+                autoPlay
+              />
+              <canvas ref={canvasRef} className="hidden" />
+              <div className="absolute inset-0 border-[3px] border-gold/60 rounded-2xl pointer-events-none" />
+            </div>
             <button
               type="button"
               onClick={stopCamera}
