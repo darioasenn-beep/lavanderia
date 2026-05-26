@@ -30,7 +30,8 @@ export default function Home() {
               setScanState("success")
               await scannerRef.current?.stop()
 
-              const cleanedId = decodedText.replace("BOLSA-", "")
+              const match = decodedText.trim().match(/\/q\/([A-Za-z0-9_-]+)/i)
+              const cleanedId = match ? match[1] : decodedText.replace("BOLSA-", "")
 
               setTimeout(() => {
                 window.location.href = `/bolsa/${cleanedId}`
