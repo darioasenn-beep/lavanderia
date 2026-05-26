@@ -10,7 +10,7 @@ export async function sendReadyNotification(
   const from = process.env.TWILIO_WHATSAPP_FROM
 
   if (!accountSid || !authToken || !from) {
-    console.warn("WhatsApp: Twilio no configurado — saltando notificación")
+    console.log("📲 WhatsApp simulado — pedido listo:", { phone, roomNumber, itemCount })
     return
   }
 
