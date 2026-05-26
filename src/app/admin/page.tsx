@@ -44,6 +44,7 @@ export default function AdminDashboard() {
   const [bags, setBags] = useState<BagWithUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,12 +79,17 @@ export default function AdminDashboard() {
 
   const updateStatus = useCallback(
     async (orderId: string, status: string) => {
-      await fetch(`/api/admin/orders/${orderId}`, {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+      const data = await res.json();
       refreshData();
+      if (data.whatsappSent) {
+        setToast("📲 WhatsApp enviado al huésped");
+        setTimeout(() => setToast(null), 4000);
+      }
     },
     [refreshData]
   );
@@ -126,6 +132,12 @@ export default function AdminDashboard() {
           <span className="font-medium text-navy">{assignedBags.length}</span>
         </div>
       </div>
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 rounded-2xl bg-green-600 px-5 py-3 text-sm text-white shadow-lg animate-fade-in">
+          {toast}
+        </div>
+      )}
 
       <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
         <button

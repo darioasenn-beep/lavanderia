@@ -34,6 +34,8 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  let whatsappSent = false;
+
   if (status === "Ready" && data) {
     const { data: profile } = await supabase
       .from("client_profiles")
@@ -48,13 +50,15 @@ export async function PATCH(
         .eq("id", data.user_id)
         .single();
 
-      sendReadyNotification(
+      await sendReadyNotification(
         profile.phone,
         user?.room_number ?? "",
         data.item_count
       ).catch((err) => console.error("WhatsApp error:", err));
+
+      whatsappSent = true;
     }
   }
 
-  return NextResponse.json({ order: data });
+  return NextResponse.json({ order: data, whatsappSent });
 }
