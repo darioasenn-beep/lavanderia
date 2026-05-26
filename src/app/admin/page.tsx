@@ -186,7 +186,10 @@ export default function AdminDashboard() {
                 {STATUS_ACTIONS[order.status]?.map((action) => (
                   <button
                     key={action.next}
-                    onClick={() => updateStatus(order.order_id, action.next)}
+                    onClick={() => {
+                      if (confirm(`¿${action.label}?`))
+                        updateStatus(order.order_id, action.next);
+                    }}
                     className={`px-3 py-1 rounded-lg text-[10px] font-medium ${action.color} transition-colors`}
                   >
                     {action.label}
