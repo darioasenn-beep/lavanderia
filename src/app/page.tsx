@@ -78,20 +78,11 @@ export default function Home() {
             transition={{ duration: 0.7 }}
           >
             {/* LOGO */}
-            <h1 className="mb-8 text-6xl font-light tracking-tight md:text-8xl">
-              <span
-                className="font-serif text-white"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                lavader
-              </span>
-              <span
-                className="ml-1 font-mono text-cyan-400"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                IA
-              </span>
-            </h1>
+            <img
+              src="/logo.png"
+              alt="lavaderIA"
+              className="mb-8 h-14 md:h-20 w-auto object-contain"
+            />
 
             {/* HEADLINE */}
             <h2 className="max-w-xl text-3xl font-medium leading-tight text-white md:text-5xl">
