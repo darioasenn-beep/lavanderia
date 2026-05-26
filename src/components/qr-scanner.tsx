@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import jsQR from "jsqr";
 
 type Props = {
@@ -11,63 +11,65 @@ export function QrScanner({ onCode }: Props) {
   const [open, setOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const scanningRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const onCodeRef = useRef(onCode);
+  onCodeRef.current = onCode;
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, []);
 
   const startCamera = async () => {
     setOpen(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 640 } },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      scanFrame();
+      const video = videoRef.current;
+      if (!video) return;
+      video.srcObject = stream;
+      await video.play();
+
+      timerRef.current = setInterval(() => {
+        if (video.readyState < video.HAVE_CURRENT_DATA) return;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 640;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(video, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+        if (code) {
+          stopCamera();
+          const data = code.data.trim();
+          const match = data.match(/\/q\/([A-Za-z0-9_-]+)/i);
+          onCodeRef.current(match ? match[1] : data);
+        }
+      }, 500);
     } catch {
       setOpen(false);
-      alert("No se pudo acceder a la cámara");
+      alert("No se pudo acceder a la cámara.\nAsegurate de permitir el acceso.");
     }
   };
 
   const stopCamera = () => {
-    scanningRef.current = false;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
     setOpen(false);
-  };
-
-  const scanFrame = () => {
-    if (!videoRef.current || !open) return;
-    scanningRef.current = true;
-
-    const video = videoRef.current;
-    if (video.readyState < video.HAVE_CURRENT_DATA) {
-      if (scanningRef.current) requestAnimationFrame(scanFrame);
-      return;
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(video, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-    if (code) {
-      stopCamera();
-      onCode(code.data);
-      return;
-    }
-
-    if (scanningRef.current) {
-      requestAnimationFrame(scanFrame);
-    }
   };
 
   return (
