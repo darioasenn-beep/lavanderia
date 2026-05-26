@@ -17,5 +17,9 @@
 
 	"images": {
 		"binding": "IMAGES"
+	},
+	"vars": {
+		"NEXT_PUBLIC_SUPABASE_URL": "https://dzhhoupjwfypyqirabkl.supabase.co",
+		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_WenKZ6l7QdE6Ko4-JfrUSA_cjTI-WmC"
 	}
 }
