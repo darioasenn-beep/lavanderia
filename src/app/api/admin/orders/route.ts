@@ -23,8 +23,26 @@ export async function GET(req: NextRequest) {
     .select("*, users(room_number, last_name)")
     .order("created_at", { ascending: false });
 
+  const userIds = [...new Set((orders ?? []).map((o) => o.user_id).filter(Boolean))];
+
+  const { data: profiles } = await supabase
+    .from("client_profiles")
+    .select("user_id, phone")
+    .in("user_id", userIds);
+
+  const phoneByUserId = Object.fromEntries(
+    (profiles ?? []).map((p) => [p.user_id, p.phone])
+  );
+
+  const ordersWithPhone = (orders ?? []).map((o) => ({
+    ...o,
+    client_profiles: o.user_id && phoneByUserId[o.user_id]
+      ? { phone: phoneByUserId[o.user_id] }
+      : null,
+  }));
+
   return NextResponse.json(
-    { orders: orders ?? [], bags: bags ?? [] },
+    { orders: ordersWithPhone, bags: bags ?? [] },
     {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate",

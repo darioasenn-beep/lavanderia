@@ -64,7 +64,7 @@ export interface Order {
 
 export interface OrderWithUser extends Order {
   users: Pick<User, "room_number" | "last_name">;
-  client_profiles?: Pick<ClientProfile, "profile_type" | "name" | "phone"> | null;
+  client_profiles?: { phone: string | null } | null;
   corporate_details?: Pick<CorporateDetails, "name" | "cuit"> | null;
 }
 
