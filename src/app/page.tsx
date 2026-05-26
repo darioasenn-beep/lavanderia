@@ -53,109 +53,105 @@ export default function Home() {
   }, [scannerOpen])
 
   return (
-    <section className="relative flex min-h-screen flex-col overflow-hidden bg-[#050816] text-white">
-      {/* BG — gradiente + grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.14),transparent_40%)]" />
-      <div className="absolute inset-0 opacity-[0.03]">
-        <div className="h-full w-full bg-[linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[size:80px_80px]" />
-      </div>
+    <section className="relative flex min-h-screen flex-col overflow-hidden bg-off-white">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(27,42,74,0.04),transparent_50%)]" />
 
-      {/* HERO CONTENT */}
       <motion.div
         animate={{
-          opacity: scannerOpen ? 0.2 : 1,
+          opacity: scannerOpen ? 0.15 : 1,
           scale: scannerOpen ? 0.98 : 1,
-          filter: scannerOpen ? "blur(8px)" : "blur(0px)",
+          filter: scannerOpen ? "blur(6px)" : "blur(0px)",
         }}
         transition={{ duration: 0.3 }}
         className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-6 py-20 lg:flex-row"
       >
-        {/* LEFT COLUMN */}
         <div className="flex-1">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* LOGO */}
             <img
               src="/logo.svg"
               alt="lavaderIA"
-              className="mb-8 h-14 md:h-20 w-auto object-contain"
+              className="mb-10 h-14 md:h-20 w-auto object-contain"
             />
 
-            {/* HEADLINE */}
-            <h2 className="max-w-xl text-3xl font-medium leading-tight text-white md:text-5xl">
+            <h2 className="max-w-xl text-4xl font-light leading-tight text-slate-900 md:text-6xl">
               Tu ropa,<br />
               conectada.
             </h2>
 
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-zinc-400">
+            <p className="mt-5 max-w-md text-base leading-relaxed text-slate-400">
               Seguimiento en tiempo real, historial de prendas y acceso instantáneo mediante QR inteligente.
             </p>
 
-            {/* CTAs */}
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={() => setScannerOpen(true)}
-                className="group relative overflow-hidden rounded-2xl border border-cyan-400/20 bg-cyan-400 px-8 py-5 font-medium text-[#050816] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(34,211,238,0.35)]"
+                className="group relative overflow-hidden rounded-2xl bg-navy px-8 py-4 font-medium text-white transition-all duration-300 hover:bg-navy-light hover:shadow-xl active:scale-[0.98]"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <QrCode className="h-5 w-5" />
                   Escanear Bolsa
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
               </button>
 
               <Link
                 href="/q/"
-                className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-8 py-5 text-white backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/10"
+                className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-8 py-4 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
               >
                 Acceso Clientes
               </Link>
             </div>
 
-            {/* FEATURES */}
-            <div className="mt-12 flex flex-wrap gap-6 text-sm text-zinc-500">
-              <div>• Tracking en tiempo real</div>
-              <div>• Historial de prendas</div>
-              <div>• Wallet ECO</div>
+            <div className="mt-12 flex flex-wrap gap-6 text-sm text-slate-400">
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-1 rounded-full bg-gold" />
+                Tracking en tiempo real
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-1 rounded-full bg-gold" />
+                Historial de prendas
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-1 rounded-full bg-gold" />
+                Wallet ECO
+              </div>
             </div>
           </motion.div>
         </div>
 
-        {/* RIGHT COLUMN — BAG MOCKUP */}
         <div className="relative mt-20 flex flex-1 items-center justify-center lg:mt-0">
-          <div className="absolute h-[500px] w-[500px] rounded-full bg-cyan-400/10 blur-3xl" />
+          <div className="absolute h-[420px] w-[420px] rounded-full bg-gold/5 blur-3xl" />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            <div className="relative h-[520px] w-[380px] overflow-hidden rounded-[40px] border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl">
-              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] to-transparent" />
-
+            <div className="relative h-[500px] w-[360px] overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl">
               <div className="relative flex h-full flex-col items-center justify-center">
-                <div className="rounded-3xl border border-white/10 bg-black/30 p-8">
-                  <div className="rounded-2xl bg-white p-5">
-                    <QrCode className="h-36 w-36 text-black" />
+                <div className="rounded-2xl border border-slate-100 bg-off-white p-6">
+                  <div className="rounded-xl bg-white p-4 shadow-sm">
+                    <QrCode className="h-32 w-32 text-slate-800" />
                   </div>
                 </div>
 
-                <div className="mt-8 text-center">
+                <div className="mt-6 text-center">
+                  <div className="font-mono text-xs text-slate-400">NÚMERO DE BOLSA</div>
                   <div
-                    className="font-mono text-cyan-400"
+                    className="mt-1 font-mono text-lg text-navy"
                     style={{ fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     BOLSA-84722
                   </div>
-                  <div className="mt-3 text-sm text-zinc-400">Lavado Inteligente</div>
                 </div>
 
-                <div className="mt-10 w-full space-y-3">
+                <div className="mt-8 w-full space-y-2">
                   <StatusItem label="Recepción" active />
                   <StatusItem label="Lavado" active />
                   <StatusItem label="Secado" />
@@ -165,69 +161,64 @@ export default function Home() {
             </div>
 
             <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 4 }}
-              className="absolute -right-10 top-10 rounded-2xl border border-cyan-400/20 bg-[#0a1024]/80 px-5 py-4 backdrop-blur-xl"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 3.5 }}
+              className="absolute -right-8 top-8 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-lg"
             >
-              <div className="text-xs text-zinc-500">Estado actual</div>
-              <div className="mt-1 text-cyan-400">En lavado</div>
+              <div className="text-[11px] text-slate-400">Estado actual</div>
+              <div className="mt-0.5 text-sm font-medium text-navy">En lavado</div>
             </motion.div>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* QR MODAL */}
       <AnimatePresence>
         {scannerOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-2xl"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-md px-6"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-sm px-4"
             >
-              {/* CLOSE */}
               <button
                 onClick={async () => {
                   await scannerRef.current?.stop()
                   setScannerOpen(false)
                   setScanState("idle")
                 }}
-                className="absolute right-8 top-4 z-50 rounded-full border border-white/10 bg-white/10 p-2 text-white backdrop-blur-xl"
+                className="absolute right-6 top-3 z-50 rounded-full bg-white/80 p-1.5 text-slate-500 shadow-sm backdrop-blur-md hover:bg-white"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
 
-              <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#0a1024] p-5 shadow-2xl">
-                <div className="mb-5 text-center">
-                  <h3 className="text-xl font-medium">Escaneá tu bolsa</h3>
-                  <p className="mt-2 text-sm text-zinc-500">Apuntá la cámara al QR inteligente.</p>
+              <div className="overflow-hidden rounded-[24px] bg-white p-4 shadow-2xl">
+                <div className="mb-4 text-center">
+                  <h3 className="text-lg font-medium text-slate-900">Escaneá tu bolsa</h3>
+                  <p className="mt-1 text-sm text-slate-400">Apuntá la cámara al código QR.</p>
                 </div>
 
-                <div className="relative overflow-hidden rounded-3xl border border-white/10">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-black">
                   <div id="qr-reader" className="overflow-hidden" />
-
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="h-[260px] w-[260px] rounded-[32px] border-2 border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.4)]" />
+                    <div className="h-[220px] w-[220px] rounded-[24px] border-2 border-gold shadow-[0_0_30px_rgba(201,168,76,0.3)]" />
                   </div>
                 </div>
 
-                <div className="mt-5 text-center">
-                  {scanState === "idle" && <p className="text-zinc-500">Escaneando bolsa...</p>}
+                <div className="mt-4 text-center text-sm">
+                  {scanState === "idle" && <span className="text-slate-400">Escaneando bolsa...</span>}
                   {scanState === "searching" && (
-                    <p className="text-cyan-400">Retirando información de tu pedido...</p>
+                    <span className="text-navy">Retirando información de tu pedido...</span>
                   )}
-                  {scanState === "success" && <p className="text-green-400">Bolsa encontrada ✓</p>}
-                  {scanState === "error" && (
-                    <p className="text-red-400">No se pudo acceder a la cámara</p>
-                  )}
+                  {scanState === "success" && <span className="text-green-600 font-medium">Bolsa encontrada ✓</span>}
+                  {scanState === "error" && <span className="text-red-500">No se pudo acceder a la cámara</span>}
                 </div>
               </div>
             </motion.div>
@@ -240,15 +231,13 @@ export default function Home() {
 
 function StatusItem({ label, active = false }: { label: string; active?: boolean }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3">
+    <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-off-white/50 px-4 py-2.5">
       <div
-        className={`h-2.5 w-2.5 rounded-full ${
-          active
-            ? "bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]"
-            : "bg-zinc-700"
+        className={`h-2 w-2 rounded-full ${
+          active ? "bg-navy shadow-[0_0_8px_rgba(27,42,74,0.35)]" : "bg-slate-200"
         }`}
       />
-      <span className={`text-sm ${active ? "text-white" : "text-zinc-500"}`}>{label}</span>
+      <span className={`text-sm ${active ? "font-medium text-navy" : "text-slate-400"}`}>{label}</span>
     </div>
   )
 }
