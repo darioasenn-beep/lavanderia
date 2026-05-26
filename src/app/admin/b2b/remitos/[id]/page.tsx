@@ -136,7 +136,7 @@ export default function RemitoViewPage() {
 
           <!-- LEFT: Logo + emitter data -->
           <div style="display:flex;align-items:center;gap:12px">
-            <img src="${origin}/logo.png" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:contain;display:block;flex-shrink:0" />
+            <img src="${origin}/logo.svg" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:contain;display:block;flex-shrink:0" />
             <div style="font-size:7.5pt;line-height:1.25;color:#374151">
               <div style="font-weight:700">Lavander\u00eda ACME</div>
               <div>20-28307309-3</div>
@@ -247,7 +247,7 @@ export default function RemitoViewPage() {
               {/* LEFT: Logo + emitter data */}
               <div className="flex items-center gap-3">
                 <img
-                  src="/logo.png"
+                  src="/logo.svg"
                   alt=""
                   className="h-12 w-12 object-contain rounded-full shrink-0"
                 />
