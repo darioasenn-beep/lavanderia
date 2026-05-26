@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import jsQR from "jsqr";
+import { Html5Qrcode } from "html5-qrcode";
 
 type Props = {
   onCode: (code: string) => void;
@@ -9,79 +9,48 @@ type Props = {
 
 export function QrScanner({ onCode }: Props) {
   const [open, setOpen] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const rafRef = useRef<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
   const onCodeRef = useRef(onCode);
   onCodeRef.current = onCode;
 
   useEffect(() => {
     return () => {
-      cancelAnimationFrame(rafRef.current);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {});
       }
     };
   }, []);
 
   const startCamera = async () => {
+    if (!containerRef.current) return;
     setOpen(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: "environment" },
-      });
-      streamRef.current = stream;
-      const video = videoRef.current;
-      if (!video) return;
-      video.srcObject = stream;
 
-      video.onloadedmetadata = () => video.play();
+    const scanner = new Html5Qrcode("qr-reader");
+    scannerRef.current = scanner;
+
+    try {
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 15, qrbox: { width: 280, height: 280 } },
+        (decodedText) => {
+          scanner.stop().catch(() => {});
+          setOpen(false);
+          const match = decodedText.trim().match(/\/q\/([A-Za-z0-9_-]+)/i);
+          onCodeRef.current(match ? match[1] : decodedText.trim());
+        },
+        () => {}
+      );
     } catch {
       setOpen(false);
       alert("No se pudo acceder a la cámara.\nAsegurate de permitir el acceso.");
     }
   };
 
-  const handlePlaying = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    const scan = () => {
-      if (video.readyState < video.HAVE_CURRENT_DATA) {
-        rafRef.current = requestAnimationFrame(scan);
-        return;
-      }
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(video, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-      if (code) {
-        stopCamera();
-        const data = code.data.trim();
-        const match = data.match(/\/q\/([A-Za-z0-9_-]+)/i);
-        onCodeRef.current(match ? match[1] : data);
-        return;
-      }
-
-      rafRef.current = requestAnimationFrame(scan);
-    };
-
-    scan();
-  };
-
   const stopCamera = () => {
-    cancelAnimationFrame(rafRef.current);
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
+    if (scannerRef.current) {
+      scannerRef.current.stop().catch(() => {});
+      scannerRef.current = null;
     }
     setOpen(false);
   };
@@ -106,26 +75,15 @@ export function QrScanner({ onCode }: Props) {
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="relative w-full max-w-sm bg-black rounded-2xl overflow-hidden">
-            <div className="relative w-full" style={{ aspectRatio: "1/1" }}>
-              <video
-                ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                onPlaying={handlePlaying}
-                playsInline
-                muted
-                autoPlay
-              />
-              <canvas ref={canvasRef} className="hidden" />
-              <div className="absolute inset-0 border-[3px] border-gold/60 rounded-2xl pointer-events-none" />
-            </div>
+            <div ref={containerRef} id="qr-reader" className="w-full" />
             <button
               type="button"
               onClick={stopCamera}
-              className="absolute top-3 right-3 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center text-lg hover:bg-black/70 transition-colors"
+              className="absolute top-3 right-3 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center text-lg hover:bg-black/70 transition-colors z-10"
             >
               ✕
             </button>
-            <p className="absolute bottom-4 left-0 right-0 text-center text-white text-xs opacity-70">
+            <p className="absolute bottom-4 left-0 right-0 text-center text-white text-xs opacity-70 pointer-events-none z-10">
               Apuntá al código QR
             </p>
           </div>
