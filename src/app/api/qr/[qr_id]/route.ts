@@ -48,7 +48,7 @@ export async function POST(
 ) {
   const supabase = getSupabaseClient(true);
   const { qr_id } = await params;
-  const { room_number, last_name } = await req.json();
+  const { room_number, last_name, phone } = await req.json();
 
   if (!room_number || !last_name) {
     return NextResponse.json(
@@ -80,6 +80,25 @@ export async function POST(
       .from("bags")
       .update({ user_id: userId, status: "Assigned" })
       .eq("qr_id", qr_id);
+
+    if (phone) {
+      const { data: existing } = await supabase
+        .from("client_profiles")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from("client_profiles")
+          .update({ phone })
+          .eq("user_id", userId);
+      } else {
+        await supabase
+          .from("client_profiles")
+          .insert({ user_id: userId, profile_type: "RESIDENT", phone });
+      }
+    }
   }
 
   return NextResponse.json({ user: { id: userId }, qr_id });

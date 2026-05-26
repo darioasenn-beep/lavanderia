@@ -15,6 +15,7 @@ export default function QRPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [roomNumber, setRoomNumber] = useState("");
   const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [itemCount, setItemCount] = useState(1);
   const [serviceType, setServiceType] = useState<"Regular" | "Delicado">("Regular");
   const [submitting, setSubmitting] = useState(false);
@@ -51,6 +52,7 @@ export default function QRPage() {
           const parsed = JSON.parse(saved);
           setRoomNumber(parsed.roomNumber ?? "");
           setLastName(parsed.lastName ?? "");
+          setPhone(parsed.phone ?? "");
         }
         setView("unassigned");
       }
@@ -72,7 +74,11 @@ export default function QRPage() {
       const res = await fetch(`/api/qr/${qr_id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ room_number: roomNumber.trim(), last_name: lastName.trim() }),
+        body: JSON.stringify({
+          room_number: roomNumber.trim(),
+          last_name: lastName.trim(),
+          phone: phone.trim() || undefined,
+        }),
       });
       const data = await res.json();
       if (data.error) {
@@ -90,7 +96,7 @@ export default function QRPage() {
     } finally {
       setSubmitting(false);
     }
-  }, [qr_id, roomNumber, lastName]);
+  }, [qr_id, roomNumber, lastName, phone]);
 
   const handleSubmitOrder = useCallback(async () => {
     setSubmitting(true);
@@ -170,6 +176,19 @@ export default function QRPage() {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Ej: García"
+              className="w-full px-4 py-3 bg-off-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-slate-400 uppercase tracking-wide mb-1.5">
+              WhatsApp <span className="text-slate-300">(opcional)</span>
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Ej: +54 11 5555-1234"
               className="w-full px-4 py-3 bg-off-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all"
             />
           </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
+import { sendReadyNotification } from "@/lib/whatsapp";
 
 function isAdmin(req: NextRequest) {
   return req.cookies.get("admin_session")?.value === "authenticated";
@@ -31,6 +32,28 @@ export async function PATCH(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (status === "Ready" && data) {
+    const { data: profile } = await supabase
+      .from("client_profiles")
+      .select("phone")
+      .eq("user_id", data.user_id)
+      .maybeSingle();
+
+    if (profile?.phone) {
+      const { data: user } = await supabase
+        .from("users")
+        .select("room_number")
+        .eq("id", data.user_id)
+        .single();
+
+      sendReadyNotification(
+        profile.phone,
+        user?.room_number ?? "",
+        data.item_count
+      ).catch((err) => console.error("WhatsApp error:", err));
+    }
   }
 
   return NextResponse.json({ order: data });
